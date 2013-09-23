@@ -17,7 +17,7 @@
 #else
 #include <GL/glut.h>
 #endif
-int th=0;         //  Azimuth of view angle
+int th=90;         //  Azimuth of view angle
 int ph=0;         //  Elevation of view angle
 int axes=1;       //  Display axes
 int mode=0;       //  Depth mode

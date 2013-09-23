@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
    /*  Time step  */
    double dt = 0.001;
 
-   printf("%5d %8.3f %8.3f %8.3f\n",0,x,y,z);
+   glVertex4d(x,y,z,w);
    /*
     *  Integrate 50,000 steps (50 time units with dt = 0.001)
     *  Explicit Euler integration
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
       x += dt*dx;
       y += dt*dy;
       z += dt*dz;
-      printf("%5d %8.3f %8.3f %8.3f\n",i+1,x,y,z);
+      glVertex4d(x,y,z,w);
    }
    return 0;
 }

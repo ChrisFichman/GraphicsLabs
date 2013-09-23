@@ -13,15 +13,26 @@
 #endif
 
 //  Globals
-int th=90;       // Azimuth of view angle
+int th=0;       // Azimuth of view angle
 int ph=0;       // Elevation of view angle
 // ^ For rotation 
-int mode=1;     // Dimension (1-4)
-double z=0;     // Z variable
+int initials=1; //Used to swap between inital value set 1-4(or user input (5))
 double w=1;     // W variable
-double dim=2;   // Dimension of orthogonal box
-char* text[] = {"","2D","3D constant Z","3D","4D"};  // Dimension display text
+double dim=110;   // Dimension of orthogonal box
+char* text[] = {"","r=28,s=10,b=2.666","r=13,s=10,b=2.66",
+						"r=14,s=30,b=4.666","r=42,s=15,b=4.666",
+							"User Input"}; //Initials
+//Variables for user input
+char usr_in[10000];
+double usr_r = 0;
+double usr_s = 0;
+double usr_b = 0; 
 
+char trans_mode = 'x'; //Determines axis of translation.
+double x_trans = 0;
+double y_trans = 0;
+double z_trans = 0;
+//Global so that they can be modified with + and - commands 
 /*
  *  Convenience routine to output raster text
  *  Use VARARGS to make this more flexible
@@ -41,82 +52,110 @@ void Print(const char* format , ...)
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,*ch++);
 }
 
+void glLorenz(int r, int s, int b, int w){
+   
+   int i;
+   /*  Coordinates  */
+   double x = 1;
+   double y = 1;
+   double z = 1;
+   /*  Time step  */
+   double dt = 0.001;
+
+   glVertex4d(x+x_trans,y+y_trans,z+z_trans,w);
+   /*
+    *  Integrate 50,000 steps (50 time units with dt = 0.001)
+    *  Explicit Euler integration
+    */
+   for (i=0;i<50000;i++)
+   {
+      glColor3f(0,(1-i/50000.0),i/50000.0);
+      double dx = s*(y-x);
+      double dy = x*(r-z)-y;
+      double dz = x*y - b*z;
+      x += dt*dx;
+      y += dt*dy;
+      z += dt*dz;
+      glVertex4d(x+x_trans,y+y_trans,z+z_trans,w);
+   }
+}
 /*
  *  Display the scene
  */
 void display()
 {
+   
    //  Clear the image
    glClear(GL_COLOR_BUFFER_BIT);
    //  Reset previous transforms
    glLoadIdentity();
    //  Set view angle
-   glRotated(ph,1,0,0);
+   glRotated(ph,-1,0,0);
    glRotated(th,0,1,0);
-   //  Draw 10 pixel yellow points
-   glColor3f(1,1,0);
+   //  Color the attractor
+   glColor3f(0,1,0.1);
    glPointSize(10);
-   glBegin(GL_POINTS);
-   switch (mode)
+
+   //  Draw the Lorenz Attractor
+   glBegin(GL_LINE_STRIP);
+   switch(initials)
    {
-   //  Two dimensions
-   case 1:
-      glVertex2d(0.1,0.1);
-      glVertex2d(0.3,0.3);
-      glVertex2d(0.5,0.5);
-      glVertex2d(0.7,0.7);
-      glVertex2d(0.9,0.9);
-      break;
-   //  Three dimensions - constant Z
-   case 2:
-      glVertex3d(0.1,0.1,z);
-      glVertex3d(0.3,0.3,z);
-      glVertex3d(0.5,0.5,z);
-      glVertex3d(0.7,0.7,z);
-      glVertex3d(0.9,0.9,z);
-      break;
-   //  Three dimensions - variable Z
-   case 3:
-      glVertex3d(0.1,0.1,0.1);
-      glVertex3d(0.3,0.3,0.2);
-      glVertex3d(0.5,0.5,0.4);
-      glVertex3d(0.7,0.7,0.6);
-      glVertex3d(0.9,0.9,0.9);
-      break;
-   //  Four dimensions
-   case 4:
-      glVertex4d(0.1,0.1,0.1,w);
-      glVertex4d(0.3,0.3,0.2,w);
-      glVertex4d(0.5,0.5,0.4,w);
-      glVertex4d(0.7,0.7,0.6,w);
-      glVertex4d(0.9,0.9,0.9,w);
-      break;
+		case 1:
+			glLorenz(28,10,2.666,w);
+		break;
+		
+		case 2:
+			glLorenz(13,10,2.666,w);
+			break;
+		
+		case 3:
+			glLorenz(14,30,4.666,w);
+			break;
+		
+		case 4:
+			glLorenz(42,15,4.666, w);
+			break;
+		
+		case 5:
+			if(usr_r != 0 && usr_s != 0 && usr_b != 0){
+				glLorenz(usr_r, usr_s, usr_b, w);
+			}else{
+				printf("Please enter r(between 0-60 for optimal viewing): ");
+				scanf("%s", usr_in);
+				usr_r = atof(usr_in);
+				printf("Please enter s: ");
+				scanf("%s", usr_in);
+				usr_s = atof(usr_in);
+				printf("Please enter b(between 2-8 for optimal viewing): ");
+				scanf("%s", usr_in);
+				usr_b = atof(usr_in);
+				glLorenz(usr_r, usr_s, usr_b, w);
+			}
+			break;
+		
    }
    glEnd();
    //  Draw axes in white
    glColor3f(1,1,1);
    glBegin(GL_LINES);
-   glVertex3d(0,0,0);
-   glVertex3d(1,0,0);
-   glVertex3d(0,0,0);
-   glVertex3d(0,1,0);
-   glVertex3d(0,0,0);
-   glVertex3d(0,0,1);
+   glVertex3d(100+x_trans,0+y_trans,0+z_trans);
+   glVertex3d(-100+x_trans,0+y_trans,0+z_trans);
+   glVertex3d(0+x_trans,100+y_trans,0+z_trans);
+   glVertex3d(0+x_trans,-100+y_trans,0+z_trans);
+   glVertex3d(0+x_trans,0+y_trans,100+z_trans);
+   glVertex3d(0+x_trans,0+y_trans,-100+z_trans);
    glEnd();
    //  Label axes
-   glRasterPos3d(1,0,0);
+   glRasterPos3d(100+x_trans,0+y_trans,0+z_trans);
    Print("X");
-   glRasterPos3d(0,1,0);
+   glRasterPos3d(0+x_trans,100+y_trans,0+z_trans);
    Print("Y");
-   glRasterPos3d(0,0,1);
+   glRasterPos3d(0+x_trans,0+y_trans,100+z_trans);
    Print("Z");
    //  Display parameters
    glWindowPos2i(5,5);
-   Print("View Angle=%d,%d  %s",th,ph,text[mode]);
-   if (mode==2)
-      Print("  z=%.1f",z);
-   else if (mode==4)
-      Print("  w=%.1f",w);
+   Print("View Angle=%d,%d  %s",-th,-ph,text[initials]);
+   Print("  w=%.1f",w);
    //  Flush and swap
    glFlush();
    glutSwapBuffers();
@@ -130,32 +169,68 @@ void key(unsigned char ch,int x,int y)
    //  Exit on ESC
    if (ch == 27)
       exit(0);
-   //  Reset view angle
+   //  Reset view angle and trace ball
    else if (ch == '0')
-      th = ph = 0;
-   //  Switch dimensions
-   else if ('1'<=ch && ch<='4')
+      th = ph = x_trans = y_trans = z_trans = 0;
+
+   else if (ch == 'x' || ch == 'y' || ch == 'z' || ch == 'w')
    {
-      mode = ch-'0';
-      if (mode==2) z = 0;
-      if (mode==4) w = 1;
+		if(ch == 'x'){
+			trans_mode = ch;
+		}else if(ch == 'y'){
+			trans_mode = ch;
+		}else if(ch == 'z'){
+			trans_mode = ch;
+		}else if(ch == 'w'){
+			trans_mode = ch;
+		}
    }
-   //  Increase w by 0.1
+   //  Increase x, z, or y by 1
    else if (ch == '+')
    {
-      if (mode==2)
-         z += 0.1;
-      else
-         w += 0.1;
+       switch(trans_mode){
+			case 'x':
+				x_trans +=1;
+				break;
+			case 'y':
+				y_trans +=1;
+				break;
+			case 'z':
+				z_trans +=1;
+				break;
+			case 'w':
+				w += 0.1;
+				break;
+		}
    }
-   //  Decrease w by 0.1
+   //  Decrease x, z, or y by 1
    else if (ch == '-')
    {
-      if (mode==2)
-         z -= 0.1;
-      else
-         w -= 0.1;
+        switch(trans_mode){
+			case 'x':
+				x_trans -=1;
+				break;
+			case 'y':
+				y_trans -=1;
+				break;
+			case 'z':
+				z_trans -=1;
+				break;
+			case 'w':
+				w -= 0.1;
+				break;
+		}
    }
+   //   Determine initial values
+   else if ('1' <= ch && ch <= '5')
+   {
+		initials = ch-'0';
+		if( ch == '5'){
+			usr_s = 0;
+			usr_b = 0;
+			usr_r = 0;
+		}
+   } 
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -218,7 +293,7 @@ int main(int argc,char* argv[])
    //  Request 500 x 500 pixel window
    glutInitWindowSize(500,500);
    //  Create the window
-   glutCreateWindow("Coordinates");
+   glutCreateWindow("Lorenz Attractor");
    //  Tell GLUT to call "display" when the scene should be drawn
    glutDisplayFunc(display);
   //  Tell GLUT to call "reshape" when the window is resized
