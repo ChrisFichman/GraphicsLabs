@@ -1,0 +1,27 @@
+#README: Assignment 3
+#Author: Chris Fichman
+
+Compile & Run Instructions:
+Open terminal and run the following commands in the 
+directory with makefile and .c file 
+
+>make clean
+>make
+>./assign3
+
+
+Runtime Notes:
+'a' key: enable/disable axes.
+'x' key: disengage/engage x-foils on X-Wings
+arrow keys: rotate image
+
+Completion Time: 
+This assignment took me roughly 7 hours to complete, I got hung up on
+ordering my verticies correctly, but the more I messed arround, the 
+better organization became, and the TIE-fighter was far quicker in the
+making than the X-Wing because of this. 
+
+I wanted to maintain the functionality of the x-wing (with vectors for
+orientation) for the tie fighter, but couldn't figure out how to do it 
+in conjunction with scaling (without having 12 variables passed into the
+function)
