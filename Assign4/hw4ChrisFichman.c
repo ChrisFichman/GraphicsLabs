@@ -21,12 +21,12 @@ int th=0;         //  Azimuth of view angle
 int ph=0;         //  Elevation of view angle
 int fov=50;       //  Field of view (for perspective)
 double asp=1;     //  Aspect ratio
-double dim=20.0;   //  Size of world
+double dim=30.0;   //  Size of world
 int x_foils = 1;	// 	X-Foil attack mode
 int len = 5;
 
-#define Cos(x) (cos((x)*3.1415927/180*(th)))
-#define Sin(x) (sin((x)*3.1415927/180*(th)))
+#define Cos(th) cos(3.1415927/180*(th))
+#define Sin(th) sin(3.1415927/180*(th))
 
 #define LEN 8192  //  Maximum length of text string
 void Print(const char* format , ...)
@@ -589,16 +589,16 @@ void special(int key,int x,int y)
 {
    //  Right arrow key - increase angle by 5 degrees
    if (key == GLUT_KEY_RIGHT)
-      th += 5;
+      th += 3;
    //  Left arrow key - decrease angle by 5 degrees
    else if (key == GLUT_KEY_LEFT)
-      th -= 5;
+      th -= 3;
    //  Up arrow key - increase elevation by 5 degrees
    else if (key == GLUT_KEY_UP)
-      ph += 5;
+      ph += 3;
    //  Down arrow key - decrease elevation by 5 degrees
    else if (key == GLUT_KEY_DOWN)
-      ph -= 5;
+      ph -= 3;
    //  PageUp key - increase dim
    else if (key == GLUT_KEY_PAGE_UP)
       dim += 0.1;
@@ -678,7 +678,7 @@ int main(int argc,char* argv[])
 	//  Request double buffered, true color window with Z buffering at 600x600
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(600,600);
-	glutCreateWindow("Projections");
+	glutCreateWindow("HW 4 - Chris Fichman - X-Wing vs. TIE Fighter");
 	//  Set callbacks
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
