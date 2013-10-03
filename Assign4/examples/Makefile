@@ -1,5 +1,5 @@
 #  List of all programs you want to build
-EX=ex10 ex11 ex12 ex13 ex14 ex15
+EX= ex9 ex10 ex11 ex12 ex13 ex14 ex15
 
 #  Libraries - Linux
 LIBS=-lglut -lGLU -lGL -lm
